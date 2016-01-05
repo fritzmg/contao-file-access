@@ -30,9 +30,7 @@
 	"extra":{
 		"contao":{
 			"sources":{
-				"file.php":"",
-				".htaccess.fileaccess":"",
-				"system/modules/file_access":"system/modules/file_access"
+				"src":"",
 			}
 		}
 	}
