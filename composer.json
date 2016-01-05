@@ -30,7 +30,7 @@
 	"extra":{
 		"contao":{
 			"sources":{
-				"src":"",
+				"src":""
 			}
 		}
 	}
