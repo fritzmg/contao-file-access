@@ -1,0 +1,39 @@
+{
+	"name":"fritzmg/contao-file-access",
+	"description":"Contao extension that allows file access restrictions for frontend users.",
+	"keywords":["contao", "files", "access", "protected"],
+	"type":"contao-module",
+	"homepage":"http://www.inspiredminds.at",
+	"license":"LGPL-3.0+",
+	"authors":[
+		{
+			"name":"Fritz Michael Gschwantner",
+			"homepage":"http://www.inspiredminds.at",
+			"email":"fmg@inspiredminds.at",
+			"role":"Developer"
+		}
+	],
+	"support":{
+		"email":"fmg@inspiredminds.at",
+		"issues":"https://github.com/fritzmg/contao-file-access/issues",
+		"source":"https://github.com/fritzmg/contao-file-access",
+		"forum":"https://community.contao.org/de"
+	},
+	"require":{
+		"php":">=5.2",
+		"contao/core":"~3.4",
+		"contao-community-alliance/composer-installer":"*"
+	},
+	"replace": {
+		"contao-legacy/file_access": "self.version"
+	},
+	"extra":{
+		"contao":{
+			"sources":{
+				"file.php":"",
+				".htaccess.fileaccess":"",
+				"system/modules/file_access":"system/modules/file_access"
+			}
+		}
+	}
+}
