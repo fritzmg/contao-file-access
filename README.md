@@ -7,6 +7,8 @@ Contao extension that allows file access restrictions for frontend users.
 
 After installing this extension, you will have the ability to activate the file protection in the file manager of the backend. Simply edit a file or folder and enable the protection. You also need to select one or more member groups for which the file or folder should be accessible. If you select none, the file will not be accessible in general (but can still be accessed via the download content element for example).
 
+![Screenshot](https://raw.githubusercontent.com/fritzmg/contao-file-access/master/screenshot.png)
+
 To enable the file access restriction, you need to redirect all URLs accessing the files to the `file.php` script, e.g. by using the following RewriteRule in your `.htaccess`:
 
 ```
