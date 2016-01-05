@@ -29,8 +29,10 @@
 	},
 	"extra":{
 		"contao":{
-			"sources":{
-				"src":""
+			"sources": {
+				"src/file.php":"file.php",
+				"src/.htaccess.fileaccess":".htaccess.fileaccess",
+				"src/system/modules/file_access":"system/modules/file_access"
 			}
 		}
 	}
