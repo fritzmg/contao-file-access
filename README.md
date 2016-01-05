@@ -26,3 +26,5 @@ This way all public files can be accessed directly and will not cause additional
 ## Important Note
 
 Since this access restriction is done via PHP, the file is also sent to the client via PHP. This means that the `max_execution_time` needs to be sufficiently large, so that any file can be transferred to the client before the script is terminated. Thus you should be aware that problems can occur if a file is either very large or the client's connection to the server is very slow, or both.
+
+Also currently any automatically generated images by Contao are __not__ protected. So if you use thumbnails of protected images, the URLs to these thumbnails can still be accessed by anyone. Though it is planned to also be able to protect those in a future version.
