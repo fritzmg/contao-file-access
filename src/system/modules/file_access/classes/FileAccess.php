@@ -83,19 +83,8 @@ class FileAccess extends \Frontend
 			}
 
 			// find the path in the database
-			if( ( $objFile = \FilesModel::findByPath( $strFile ) ) !== null )
+			if( ( $objFile = \FilesModel::findOneByPath( $strFile ) ) !== null )
 			{
-				if( $objFile instanceof \Model\Collection )
-				{
-					$logMessage = 'FileAccess error: found multiple database entries for path | count: '.$objFile->count();
-					while( $objFile->next() )
-						$logMessage.= ' | ID: '.$objFile->id.', path: '.$objFile->path;
-					log_message($logMessage);
-
-					header('HTTP/1.1 500 Internal Server Error');
-					die('Server error');
-				}
-
 				// authenticate the frontend user
 				\FrontendUser::getInstance()->authenticate();
 
