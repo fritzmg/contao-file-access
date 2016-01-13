@@ -85,6 +85,17 @@ class FileAccess extends \Frontend
 			// find the path in the database
 			if( ( $objFile = \FilesModel::findByPath( $strFile ) ) !== null )
 			{
+				if( $objFile->count() > 0 )
+				{
+					$logMessage = 'FileAccess error: found multiple database entries for path | count: '.$objFile->count();
+					while( $objFile->next() )
+						$logMessage.= ' | ID: '.$objFile->id.', path: '.$objFile->path;
+					log_message($logMessage);
+
+					header('HTTP/1.1 500 Internal Server Error');
+					die('Server error');
+				}
+
 				// authenticate the frontend user
 				\FrontendUser::getInstance()->authenticate();
 
@@ -121,11 +132,14 @@ class FileAccess extends \Frontend
 			session_write_close();
 
 			// Disable zlib.output_compression (see #6717)
-			ini_set('zlib.output_compression', 'Off');
+			@ini_set('zlib.output_compression', 'Off');
 
 			// Set headers
 			header('Content-Type: ' . $objFile->mime);
 			header('Content-Length: ' . $objFile->filesize);
+
+			// Disable maximum execution time
+			@ini_set('max_execution_time', 0);
 
 			// Output the file
 			readfile( TL_ROOT . '/' . $objFile->path );
