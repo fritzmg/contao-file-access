@@ -85,7 +85,7 @@ class FileAccess extends \Frontend
 			// find the path in the database
 			if( ( $objFile = \FilesModel::findByPath( $strFile ) ) !== null )
 			{
-				if( $objFile->count() > 0 )
+				if( $objFile instanceof \Model\Collection )
 				{
 					$logMessage = 'FileAccess error: found multiple database entries for path | count: '.$objFile->count();
 					while( $objFile->next() )
