@@ -29,7 +29,7 @@ class FileAccess extends \Frontend
 	public function __construct()
 	{
 		// Load the user object before calling the parent constructor
-		$this->import('FrontendUser', 'User');
+		\FrontendUser::getInstance();
 		parent::__construct();
 
 		// Check whether a user is logged in
@@ -91,8 +91,8 @@ class FileAccess extends \Frontend
 				// check if file is protected
 				if( !\Controller::isVisibleElement( $objFile ) )
 				{
-					header('HTTP/1.1 403 Forbidden');
-					die('Access denied');
+					$objHandler = new $GLOBALS['TL_PTY']['error_403']();
+					$objHandler->generate($strFile);
 				}
 				elseif( $objFile->pid )
 				{
@@ -102,8 +102,8 @@ class FileAccess extends \Frontend
 
 						if( !\Controller::isVisibleElement( $objFile ) )
 						{
-							header('HTTP/1.1 403 Forbidden');
-							die('Access denied');
+							$objHandler = new $GLOBALS['TL_PTY']['error_403']();
+							$objHandler->generate($strFile);
 						}
 					}
 					while( $objFile->pid );
