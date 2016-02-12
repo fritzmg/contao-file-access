@@ -25,7 +25,13 @@ RewriteRule ^(files/protected/.*)$ file.php?file=$1 [L]
 
 This way all public files can be accessed directly and will not cause additional server load by processing and sending it via PHP.
 
-Since version `1.1.0` the script generates a regular Contao 403 page when a file is accessed without sufficient permissions. Thus you are able to link to a file directly, show the user a login form and then he will be able to download/view the file without manually opening the file again.
+Since version `1.1.0` the script generates a regular Contao 403 page when a file is accessed without sufficient permissions. Thus you are able to do the following:
+
+- Create a page of the type `403 Access denied` in your site structure.
+- Create a login module with no redirect setting.
+- Add this login module to the `403 Access denied` page.
+
+Now, when a user which has not logged in yet opens the link to a file, he will be presented with the login form instead. After he logged in, he will be "redirected back" to the file again (there is no redirect happening actually, the user stays on the same URL).
 
 ## Important Notes
 
