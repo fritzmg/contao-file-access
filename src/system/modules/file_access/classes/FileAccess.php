@@ -76,7 +76,7 @@ class FileAccess extends \Frontend
 			}
 
 			// Check whether the file exists
-			if (!file_exists(TL_ROOT . '/' . $strFile))
+			if (!is_file(TL_ROOT . '/' . $strFile))
 			{
 				header('HTTP/1.1 404 Not Found');
 				die('File not found');
