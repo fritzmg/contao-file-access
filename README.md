@@ -1,3 +1,7 @@
+[![](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/fritzmg/contao-file-access)
+[![](https://img.shields.io/packagist/v/fritzmg/contao-file-access.svg)](https://packagist.org/packages/fritzmg/contao-file-access)
+[![](https://img.shields.io/packagist/dt/fritzmg/contao-file-access.svg)](https://packagist.org/packages/fritzmg/contao-file-access)
+
 Contao File Access
 =====================
 
