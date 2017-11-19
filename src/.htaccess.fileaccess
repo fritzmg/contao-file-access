@@ -1,7 +1,7 @@
 ##
 # Contao Open Source CMS
 #
-# Copyright (c) 2005-2015 Leo Feyer
+# Copyright (c) 2005-2016 Leo Feyer
 #
 # @license LGPL-3.0+
 ##
@@ -181,6 +181,15 @@ FileETag None
     Header append Vary Accept-Encoding
   </FilesMatch>
 
+  ##
+  # Do not cache source map files
+  # @see https://github.com/contao/core/issues/8532
+  ##
+  <FilesMatch "\.map$">
+    Header set Expires "0"
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, no-transform"
+  </FilesMatch>
+
 </IfModule>
 
 ##
@@ -271,7 +280,7 @@ FileETag None
   #
   # Note that not all environments support mod_rewrite and mod_cache.
   ##
-  RewriteCond %{REQUEST_FILENAME} !\.(htm|php|js|css|map|htc|png|gif|jpe?g|ico|xml|csv|txt|swf|flv|mp4|webm|ogv|mp3|ogg|oga|eot|otf|tt[cf]|woff2?|svgz?|pdf|gz)$
+  RewriteCond %{REQUEST_FILENAME} !\.(htm|php|js|css|map|htc|png|gif|jpe?g|ico|xml|csv|txt|swf|flv|mp4|webm|ogv|mp3|ogg|oga|eot|otf|tt[cf]|woff2?|svgz?|pdf|zip|gz)$
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule .*\.html$ index.php [L]
 
