@@ -1,0 +1,6 @@
+services:
+  InspiredMinds\ContaoFileAccessBundle\Controller\FilesController:
+    arguments:
+      - '%kernel.project_dir%'
+      - '@session'
+      - '@contao.framework'

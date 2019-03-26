@@ -1,0 +1,7 @@
+files:
+  path: /files/{file}
+  defaults:
+    _controller: ContaoFileAccessBundle:Files:file
+    _scope: frontend
+  requirements:
+    file: .+
