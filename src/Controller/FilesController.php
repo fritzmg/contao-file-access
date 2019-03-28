@@ -47,12 +47,12 @@ class FilesController
         $this->framework->initialize();
 
         // Authenticate the user
-        FrontendUser::getInstance()->authenticate();
+        \define('FE_USER_LOGGED_IN', FrontendUser::getInstance()->authenticate());
 
         // Check access protection
         if (null !== ($filesModel = FilesModel::findOneByPath($file))) {
             do {
-                if (!Controller::isVisibleElement($filesModel)) {
+                if ('folder' === $filesModel->type && !Controller::isVisibleElement($filesModel)) {
                     throw new AccessDeniedException();
                 }
 

@@ -33,7 +33,7 @@ class FilesCallbacks
     {
         if ('tl_files' === Input::post('FORM_SUBMIT')) {
             /** @var FilesModel $filesModel */
-            if (null !== ($filesModel = FilesModel::findById($dc->activeRecord->id))) {
+            if (null !== ($filesModel = FilesModel::findById($dc->activeRecord->id)) && 'folder' === $filesModel->type) {
                 $filesModel->protected = Input::post($dc->inputName) ? '' : '1';
                 $filesModel->save();
             }

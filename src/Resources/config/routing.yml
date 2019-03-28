@@ -3,5 +3,6 @@ files:
   defaults:
     _controller: ContaoFileAccessBundle:Files:file
     _scope: frontend
+    _token_check: true
   requirements:
     file: .+
