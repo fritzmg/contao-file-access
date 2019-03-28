@@ -57,13 +57,8 @@ class FilesController
         // Get FilesModel entity
         $filesModel = FilesModel::findOneByPath($file);
 
-        // Do not allow files that are not in the database
-        if (null === $filesModel) {
-            throw new AccessDeniedException();
-        }
-
-        // Do not allow files from the root
-        if (null === $filesModel->pid) {
+        // Do not allow files that are not in the database or don't have a parent
+        if (null === $filesModel || null === $filesModel->pid) {
             throw new PageNotFoundException();
         }
 
