@@ -54,16 +54,27 @@ class FilesController
         // Authenticate the user
         \define('FE_USER_LOGGED_IN', FrontendUser::getInstance()->authenticate());
 
-        // Check access protection
-        if (null !== ($filesModel = FilesModel::findOneByPath($file))) {
-            do {
-                if ('folder' === $filesModel->type && !Controller::isVisibleElement($filesModel)) {
-                    throw new AccessDeniedException();
-                }
+        // Get FilesModel entity
+        $filesModel = FilesModel::findOneByPath($file);
 
-                $filesModel = FilesModel::findById($filesModel->pid);
-            } while (null !== $filesModel);
+        // Do not allow files that are not in the database
+        if (null === $filesModel) {
+            throw new AccessDeniedException();
         }
+
+        // Do not allow files from the root
+        if (null === $filesModel->pid) {
+            throw new PageNotFoundException();
+        }
+
+        // Check folder permissions
+        do {
+            if ('folder' === $filesModel->type && !Controller::isVisibleElement($filesModel)) {
+                throw new AccessDeniedException();
+            }
+
+            $filesModel = FilesModel::findById($filesModel->pid);
+        } while (null !== $filesModel);
 
         // Close the session
         $this->session->save();
