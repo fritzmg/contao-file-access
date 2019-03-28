@@ -9,7 +9,9 @@ Contao extension that allows file access restrictions for frontend users.
 
 ## Usage
 
-After installing this extension, you will have the ability to allow members to access files, that are not made public. Simply edit a file or folder and enable the allowed member groups. If you select none, the file will not be accessible in general (but can still be accessed via the download content element for example).
+After installing this extension, you will have the ability to allow members to access files, that are not made public. Simply edit a folder and enable the allowed member groups. If you select none, the file will not be accessible in general (but can still be accessed via the download content element for example).
+
+![Screenshot](https://raw.githubusercontent.com/fritzmg/contao-file-access/master/screenshot.png)
 
 Since version `1.1.0` the script generates a regular Contao 403 page when a file is accessed without sufficient permissions. Thus you are able to do the following:
 
