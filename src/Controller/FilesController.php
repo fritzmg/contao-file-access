@@ -38,6 +38,11 @@ class FilesController
     {
         $file = 'files/'.$file;
 
+        // Make sure there are no attempts to hack the file system
+        if (preg_match('@^\.+@i', $file) || preg_match('@\.+/@i', $file) || preg_match('@(://)+@i', $file)) {
+            throw new PageNotFoundException();
+        }
+
         // Check whether the file exists
         if (!is_file($this->rootDir.'/'.$file)) {
             throw new PageNotFoundException();
