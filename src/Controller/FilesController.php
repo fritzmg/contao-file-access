@@ -13,13 +13,14 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoFileAccessBundle\Controller;
 
 use Contao\Controller;
-use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Exception\PageNotFoundException;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FilesModel;
 use Contao\FrontendUser;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Contao\CoreBundle\Exception\InsufficientAuthenticationException;
 
 class FilesController
 {
@@ -52,7 +53,10 @@ class FilesController
         $this->framework->initialize();
 
         // Authenticate the user
-        \define('FE_USER_LOGGED_IN', FrontendUser::getInstance()->authenticate());
+        $authenticated = FrontendUser::getInstance()->authenticate();
+
+        // Required legacy constant
+        \define('FE_USER_LOGGED_IN', $authenticated);
 
         // Get FilesModel entity
         $filesModel = FilesModel::findOneByPath($file);
@@ -65,7 +69,12 @@ class FilesController
         // Check folder permissions
         do {
             if ('folder' === $filesModel->type && !Controller::isVisibleElement($filesModel)) {
-                throw new AccessDeniedException();
+                if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
+                    throw new AccessDeniedException();
+                }
+                else {
+                    throw new InsufficientAuthenticationException();
+                }
             }
 
             $filesModel = FilesModel::findById($filesModel->pid);
