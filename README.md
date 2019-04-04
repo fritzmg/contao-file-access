@@ -5,7 +5,7 @@
 Contao File Access
 =====================
 
-Contao extension that allows file access restrictions for frontend users.
+Contao extension to allow direct file access to protected files for logged in front end users.
 
 ## Usage
 
