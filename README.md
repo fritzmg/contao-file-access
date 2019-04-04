@@ -13,7 +13,7 @@ After installing this extension, you will have the ability to allow members to a
 
 ![Screenshot](https://raw.githubusercontent.com/fritzmg/contao-file-access/master/screenshot.png)
 
-Since version `1.1.0` the script generates a regular Contao 403 page when a file is accessed without sufficient permissions. Thus you are able to do the following:
+Since version `1.1.0` the script generates a regular Contao 401 page when a file is accessed without sufficient permissions (403 for older Contao versions). Thus you are able to do the following:
 
 - Create a page of the type `401 Not authenticated` in your site structure with no redirect setting.
 - Create a login module with no redirect setting.
