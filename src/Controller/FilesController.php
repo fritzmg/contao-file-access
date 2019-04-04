@@ -13,14 +13,14 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoFileAccessBundle\Controller;
 
 use Contao\Controller;
+use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\InsufficientAuthenticationException;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FilesModel;
 use Contao\FrontendUser;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Exception\PageNotFoundException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Contao\CoreBundle\Exception\InsufficientAuthenticationException;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class FilesController
 {
@@ -72,9 +72,8 @@ class FilesController
                 if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
                     throw new AccessDeniedException();
                 }
-                else {
-                    throw new InsufficientAuthenticationException();
-                }
+
+                throw new InsufficientAuthenticationException();
             }
 
             $filesModel = FilesModel::findById($filesModel->pid);
