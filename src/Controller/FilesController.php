@@ -67,17 +67,43 @@ class FilesController
         }
 
         // Check folder permissions
-        do {
-            if ('folder' === $filesModel->type && !Controller::isVisibleElement($filesModel)) {
-                if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
-                    throw new AccessDeniedException();
-                }
+        $allowUserAccess = false;
+        $allowLoginAccess = false;
 
-                throw new InsufficientAuthenticationException();
+        do {
+            // Only check for folders and when member groups have been set
+            if ('folder' === $filesModel->type && null !== $filesModel->groups) {
+                $allowLoginAccess = true;
+
+                // Set the model to protected on the fly
+                $filesModel->protected = true;
+
+                // Check access
+                if (Controller::isVisibleElement($filesModel)) {
+                    $allowUserAccess = true;
+                    break;
+                }
             }
 
+            // Get the parent folder
             $filesModel = FilesModel::findById($filesModel->pid);
         } while (null !== $filesModel);
+
+        // Throw 404 exception, if there were no folders with member groups
+        if (!$allowLoginAccess) {
+            throw new PageNotFoundException();
+        }
+
+        // Deny access
+        if (!$allowUserAccess) {
+            // If a user is authenticated or the 401 exception does not exist, throw 403 exception
+            if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
+                throw new AccessDeniedException();
+            }
+
+            // Otherwise throw 401 exception
+            throw new InsufficientAuthenticationException();
+        }
 
         // Close the session
         $this->session->save();

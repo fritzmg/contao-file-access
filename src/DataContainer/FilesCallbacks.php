@@ -14,7 +14,6 @@ namespace InspiredMinds\ContaoFileAccessBundle\DataContainer;
 
 use Contao\DataContainer;
 use Contao\FilesModel;
-use Contao\Input;
 
 class FilesCallbacks
 {
@@ -27,18 +26,5 @@ class FilesCallbacks
                 ->applyToPalette('default', 'tl_files')
             ;
         }
-    }
-
-    public function onProtectedInputFieldCallback(DataContainer $dc): string
-    {
-        if ('tl_files' === Input::post('FORM_SUBMIT')) {
-            /** @var FilesModel $filesModel */
-            if (null !== ($filesModel = FilesModel::findById($dc->activeRecord->id)) && 'folder' === $filesModel->type) {
-                $filesModel->protected = Input::post($dc->inputName) ? '' : '1';
-                $filesModel->save();
-            }
-        }
-
-        return (new \tl_files())->protectFolder($dc);
     }
 }

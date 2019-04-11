@@ -9,7 +9,7 @@ Contao extension to allow direct file access to protected files for logged in fr
 
 ## Usage
 
-After installing this extension, you will have the ability to allow members to access files, that are not made public. Simply edit a folder and enable the allowed member groups. If you select none, the file will not be accessible in general (but can still be accessed via the download content element for example).
+After installing this extension, you will have the ability to allow members to access files, that are not made public. Simply edit a folder and enable the allowed member groups. If you select none, the file will not be accessible in general (but can still be accessed via the download content element for example). Users will have access to files, if they are allowed to access any parent folder, i.e. each folder inherits the member group access setting.
 
 ![Screenshot](https://raw.githubusercontent.com/fritzmg/contao-file-access/master/screenshot.png)
 
@@ -20,6 +20,13 @@ Since version `1.1.0` the script generates a regular Contao 401 page when a file
 - Add this login module to the `401 Not authenticated` page.
 
 Now, when a user which has not logged in yet opens the link to a file, he will be presented with the login form instead. After he logged in, he will be "redirected back" to the file again (there is no redirect happening actually, the user stays on the same URL).
+
+## Responses
+
+* If a file is not present in the database or the file system, a 404 response is generated.
+* If none of the parent folders of a file have any member groups set, a 404 response is generated.
+* If the user is not logged in, a 401 response is generated in Contao 4.6 and up, otherwise a 403 response is generated.
+* If the user is logged in and he does not have access to any of the parent folders, a 403 reponse is generated.
 
 ## Important Notes
 
