@@ -17,6 +17,7 @@ use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\InsufficientAuthenticationException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\FrontendUser;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -61,26 +62,31 @@ class FilesController
         // Get FilesModel entity
         $filesModel = FilesModel::findOneByPath($file);
 
+        // Dynamically add the file to the DBAFS
+        if (null === $filesModel) {
+            $filesModel = Dbafs::addResource($file);
+        }
+
         // Do not allow files that are not in the database or don't have a parent
         if (null === $filesModel || null === $filesModel->pid) {
             throw new PageNotFoundException();
         }
 
         // Check folder permissions
-        $allowUserAccess = false;
-        $allowLoginAccess = false;
+        $allowLogin = false;
+        $allowAccess = false;
 
         do {
             // Only check for folders and when member groups have been set
             if ('folder' === $filesModel->type && null !== $filesModel->groups) {
-                $allowLoginAccess = true;
+                $allowLogin = true;
 
                 // Set the model to protected on the fly
                 $filesModel->protected = true;
 
                 // Check access
                 if (Controller::isVisibleElement($filesModel)) {
-                    $allowUserAccess = true;
+                    $allowAccess = true;
                     break;
                 }
             }
@@ -90,12 +96,12 @@ class FilesController
         } while (null !== $filesModel);
 
         // Throw 404 exception, if there were no folders with member groups
-        if (!$allowLoginAccess) {
+        if (!$allowLogin) {
             throw new PageNotFoundException();
         }
 
         // Deny access
-        if (!$allowUserAccess) {
+        if (!$allowAccess) {
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
             if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
                 throw new AccessDeniedException();
