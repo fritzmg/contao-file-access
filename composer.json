@@ -3,6 +3,7 @@
     "description": "Contao extension that allows file access restrictions for frontend users.",
     "keywords": ["contao", "files", "access", "protected"],
     "type": "contao-bundle",
+    "homepage": "https://github.com/fritzmg/contao-file-access",
     "license": "LGPL-3.0-or-later",
     "authors": [
         {
@@ -18,6 +19,12 @@
         "source": "https://github.com/fritzmg/contao-file-access",
         "forum": "https://community.contao.org/de"
     },
+    "funding": [
+        {
+            "type":"github",
+            "url":"https://github.com/sponsors/fritzmg"
+        }
+    ],
     "require": {
         "php": ">=7.1",
         "contao/core-bundle": "^4.4",
