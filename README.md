@@ -14,9 +14,9 @@ After installing this extension, you will have the ability to allow members to a
 
 Since version `1.1.0` the script generates a regular Contao 401 page when a file is accessed without sufficient permissions (403 for older Contao versions). Thus you are able to do the following:
 
-- Create a page of the type `401 Not authenticated` in your site structure with no redirect setting.
-- Create a login module with no redirect setting.
-- Add this login module to the `401 Not authenticated` page.
+1. Create a page of the type `401 Not authenticated` in your site structure with no redirect setting.
+2. Create a login module with no redirect setting.
+3. Add this login module to the `401 Not authenticated` page.
 
 Now, when a user which has not logged in yet opens the link to a file, he will be presented with the login form instead. After he logged in, he will be "redirected back" to the file again (there is no redirect happening actually, the user stays on the same URL).
 
