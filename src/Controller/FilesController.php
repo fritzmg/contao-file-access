@@ -20,7 +20,9 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\FrontendUser;
+use Contao\PageModel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class FilesController
@@ -36,7 +38,7 @@ class FilesController
         $this->framework = $framework;
     }
 
-    public function fileAction(string $file): BinaryFileResponse
+    public function fileAction(Request $request, string $file): BinaryFileResponse
     {
         $file = 'files/'.$file;
 
@@ -102,6 +104,13 @@ class FilesController
 
         // Deny access
         if (!$allowAccess) {
+            // Set the root page for the domain as the pageModel attribute
+            $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
+
+            if (null !== $root) {
+                $request->attributes->set('pageModel', $root);
+            }
+
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
             if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
                 throw new AccessDeniedException();
