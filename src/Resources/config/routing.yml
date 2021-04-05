@@ -1,7 +1,7 @@
 files:
   path: /files/{file}
   defaults:
-    _controller: ContaoFileAccessBundle:Files:file
+    _controller: InspiredMinds\ContaoFileAccessBundle\Controller\FilesController::fileAction
     _scope: frontend
     _token_check: true
   requirements:
