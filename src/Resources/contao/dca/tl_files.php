@@ -10,8 +10,6 @@ declare(strict_types=1);
  * @license LGPL-3.0-or-later
  */
 
-$GLOBALS['TL_DCA']['tl_files']['config']['onload_callback'][] = [\InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks::class, 'onLoadCallback'];
-
 $GLOBALS['TL_DCA']['tl_files']['fields']['protected']['eval']['tl_class'] = 'clr w50';
 
 $GLOBALS['TL_DCA']['tl_files']['fields']['groups'] = [

@@ -5,3 +5,6 @@ services:
       - '@session'
       - '@contao.framework'
     tags: ['controller.service_arguments']
+
+  InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
+    autoconfigure: true
