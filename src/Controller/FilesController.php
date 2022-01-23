@@ -78,16 +78,21 @@ class FilesController
         $allowLogin = false;
         $allowAccess = false;
 
+        $objUser = FrontendUser::getInstance();
+
         do {
             // Only check for folders and when member groups have been set
-            if ('folder' === $filesModel->type && null !== $filesModel->groups) {
+            // or access to member home directory
+            if ('folder' === $filesModel->type
+                && (null !== $filesModel->groups
+                || ($objUser->accessHomeDir && $objUser->homeDir))) {
                 $allowLogin = true;
 
                 // Set the model to protected on the fly
                 $filesModel->protected = true;
 
-                // Check access
-                if (Controller::isVisibleElement($filesModel)) {
+                // Check access member group or home directory.
+                if (Controller::isVisibleElement($filesModel) || ($objUser->homeDir ===  $filesModel->uuid)) {
                     $allowAccess = true;
                     break;
                 }
