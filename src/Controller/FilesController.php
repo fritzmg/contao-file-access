@@ -84,19 +84,22 @@ class FilesController
         // Get the current user
         $user = $this->security->getUser();
 
-        // Check if this is the home directory
-        $isHomeDir = $user instanceof FrontendUser && $user->homeDir === $filesModel->uuid;
+        // Check if the current user can access their home directory
+        $canAccessHomeDir = $user instanceof FrontendUser && !empty($user->homeDir) && $user->accessHomeDir;
 
         do {
             // Only check for folders and when member groups have been set
             // or access to member home directory
             if ('folder' === $filesModel->type
                 && (null !== $filesModel->groups
-                    || ($user->accessHomeDir && $user->homeDir))) {
+                    || ($canAccessHomeDir))) {
                 $allowLogin = true;
 
                 // Set the model to protected on the fly
                 $filesModel->protected = true;
+
+                // Check if this file is the home directory
+                $isHomeDir = $user->homeDir === $filesModel->uuid;
 
                 // Check access
                 if (($canAccessHomeDir && $isHomeDir) || (Controller::isVisibleElement($filesModel))) {
