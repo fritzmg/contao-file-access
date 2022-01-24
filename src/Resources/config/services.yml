@@ -4,6 +4,7 @@ services:
       - '%kernel.project_dir%'
       - '@session'
       - '@contao.framework'
+      - '@security.helper'
     tags: ['controller.service_arguments']
 
   InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
