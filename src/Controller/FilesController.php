@@ -24,18 +24,21 @@ use Contao\PageModel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Security;
 
 class FilesController
 {
     protected $rootDir;
     protected $session;
     protected $framework;
+    private $security;
 
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework)
+    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, Security $security)
     {
         $this->rootDir = $rootDir;
         $this->session = $session;
         $this->framework = $framework;
+        $this->security = $security;
     }
 
     public function fileAction(Request $request, string $file): BinaryFileResponse
@@ -78,21 +81,25 @@ class FilesController
         $allowLogin = false;
         $allowAccess = false;
 
-        $objUser = FrontendUser::getInstance();
+        // Get the current user
+        $user = $this->security->getUser();
+
+        // Check if this is the home directory
+        $isHomeDir = $user instanceof FrontendUser && $user->homeDir === $filesModel->uuid;
 
         do {
             // Only check for folders and when member groups have been set
             // or access to member home directory
             if ('folder' === $filesModel->type
                 && (null !== $filesModel->groups
-                || ($objUser->accessHomeDir && $objUser->homeDir))) {
+                    || ($user->accessHomeDir && $user->homeDir))) {
                 $allowLogin = true;
 
                 // Set the model to protected on the fly
                 $filesModel->protected = true;
 
-                // Check access member group or home directory.
-                if (Controller::isVisibleElement($filesModel) || ($objUser->homeDir ===  $filesModel->uuid)) {
+                // Check access
+                if (($canAccessHomeDir && $isHomeDir) || (Controller::isVisibleElement($filesModel))) {
                     $allowAccess = true;
                     break;
                 }

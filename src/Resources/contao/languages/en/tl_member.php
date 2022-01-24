@@ -12,5 +12,5 @@ declare(strict_types=1);
 
 $GLOBALS['TL_LANG']['tl_member']['accessHomeDir'] = [
     'Access to home directory',
-    'The setting allows you to access the home directory even if it is protected.'
+    'This allows you to access the home directory in the front end even if it is protected.'
 ];
