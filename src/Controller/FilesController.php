@@ -59,13 +59,7 @@ class FilesController
         }
 
         // Initialize the Contao framework
-        $this->framework->initialize();
-
-        // Authenticate the user
-        $authenticated = FrontendUser::getInstance()->authenticate();
-
-        // Required legacy constant
-        \define('FE_USER_LOGGED_IN', $authenticated);
+        $this->framework->initialize(true);
 
         // Get FilesModel entity
         $filesModel = FilesModel::findOneByPath($file);

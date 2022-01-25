@@ -22,7 +22,7 @@ Now, when a user which has not logged in yet opens the link to a file, he will b
 
 ## Responses
 
-* If a file is not present in the database or the file system, a `404` response is generated.
+* If a file is not present in the database of the file system, a `404` response is generated.
 * If none of the parent folders of a file have any member groups set, a `404` response is generated.
 * If the user is not logged in, a `401` response is generated in Contao 4.6 and up, otherwise a `403` response is generated.
 * If the user is logged in and he does not have access to any of the parent folders, a `403` reponse is generated.
