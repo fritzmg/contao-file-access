@@ -84,8 +84,12 @@ class FilesController
         // Get the current user
         $user = $this->security->getUser();
 
+        if (false === $user instanceof FrontendUser) {
+            throw new PageNotFoundException();
+        }
+
         // Check if the current user can access their home directory
-        $canAccessHomeDir = $user instanceof FrontendUser && !empty($user->homeDir) && $user->accessHomeDir;
+        $canAccessHomeDir = !empty($user->homeDir) && $user->accessHomeDir;
 
         do {
             // Only check for folders and when member groups have been set
@@ -97,7 +101,7 @@ class FilesController
                 $filesModel->protected = true;
 
                 // Check if this file is the home directory
-                $isHomeDir = $user instanceof FrontendUser && $user->homeDir === $filesModel->uuid;
+                $isHomeDir = $user->homeDir === $filesModel->uuid;
 
                 // Check access
                 if (($canAccessHomeDir && $isHomeDir) || (Controller::isVisibleElement($filesModel))) {
