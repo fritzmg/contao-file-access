@@ -19,10 +19,10 @@ use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
-use Contao\FrontendUser;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Security;
 use Webmozart\PathUtil\Path;
 
 class FilesController
@@ -30,12 +30,14 @@ class FilesController
     protected $rootDir;
     protected $session;
     protected $framework;
+    protected $security;
 
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework)
+    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, Security $security)
     {
         $this->rootDir = $rootDir;
         $this->session = $session;
         $this->framework = $framework;
+        $this->security = $security;
     }
 
     public function fileAction(Request $request, string $file): BinaryFileResponse
@@ -99,7 +101,7 @@ class FilesController
         // Deny access
         if (!$allowAccess) {
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
-            if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
+            if ($this->security->isGranted('ROLE_MEMBER')) {
                 throw new AccessDeniedException();
             }
 
