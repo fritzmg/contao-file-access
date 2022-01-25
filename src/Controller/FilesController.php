@@ -88,7 +88,7 @@ class FilesController
         $user = $this->security->getUser();
 
         // Check if the current user can access their home directory
-        $canAccessHomeDir = null !== $user && !empty($user->homeDir) && $user->accessHomeDir;
+        $canAccessHomeDir = $user instanceof FrontendUser && !empty($user->homeDir) && $user->accessHomeDir;
 
         do {
             // Check if this is a folder
@@ -104,7 +104,7 @@ class FilesController
                     $filesModel->protected = true;
 
                     // Check if this is the user's home directory
-                    $isUserHomeDir = null !== $user && $user->homeDir === $filesModel->uuid;
+                    $isUserHomeDir = $user instanceof FrontendUser && $user->homeDir === $filesModel->uuid;
 
                     // Check access
                     if (($canAccessHomeDir && $isUserHomeDir) || Controller::isVisibleElement($filesModel)) {
