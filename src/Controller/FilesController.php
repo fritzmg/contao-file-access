@@ -20,10 +20,10 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\FrontendUser;
-use Contao\PageModel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Webmozart\PathUtil\Path;
 
 class FilesController
 {
@@ -48,7 +48,7 @@ class FilesController
         }
 
         // Check whether the file exists
-        if (!is_file($this->rootDir.'/'.$file)) {
+        if (!is_file(Path::join($this->rootDir, $file))) {
             throw new PageNotFoundException();
         }
 
@@ -120,6 +120,6 @@ class FilesController
         @ini_set('max_execution_time', '0');
 
         // Return file to browser
-        return new BinaryFileResponse($this->rootDir.'/'.$file);
+        return new BinaryFileResponse(Path::join($this->rootDir, $file));
     }
 }
