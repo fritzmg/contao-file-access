@@ -12,5 +12,5 @@ declare(strict_types=1);
 
 $GLOBALS['TL_LANG']['tl_member']['accessHomeDir'] = [
     'Zugriff auf Home-Verzeichnis',
-    'Mit der Einstellung können Sie auf das Home-Verzeichnis im Frontend zugreifen, auch wenn es geschützt ist.'
+    'Mit der Einstellung können Sie auf das Home-Verzeichnis im Frontend zugreifen, auch wenn es geschützt ist.',
 ];

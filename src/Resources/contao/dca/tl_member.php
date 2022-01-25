@@ -15,12 +15,13 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 $GLOBALS['TL_DCA']['tl_member']['fields']['homeDir']['eval']['tl_class'] = 'clr w50';
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['accessHomeDir'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'checkbox',
-    'eval'      => ['tl_class' => 'w50 cbx m12'],
-    'sql'       => ['type' => 'boolean', 'default' => false],
+    'eval' => ['tl_class' => 'w50 cbx m12'],
+    'sql' => ['type' => 'boolean', 'default' => false],
 ];
 
 PaletteManipulator::create()
     ->addField('accessHomeDir', 'homeDir')
-    ->applyToSubpalette('assignDir', 'tl_member');
+    ->applyToSubpalette('assignDir', 'tl_member')
+;
