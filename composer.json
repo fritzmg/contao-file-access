@@ -31,7 +31,8 @@
         "symfony/config": "^4.4 || ^5.2",
         "symfony/dependency-injection": "^4.4 || ^5.2",
         "symfony/http-foundation": "^4.4 || ^5.2", 
-        "symfony/http-kernel": "^4.4 || ^5.2"
+        "symfony/http-kernel": "^4.4 || ^5.2",
+        "webmozart/path-util": "^2.3"
     },
     "autoload": {
         "psr-4": {

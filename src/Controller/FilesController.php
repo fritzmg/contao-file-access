@@ -20,12 +20,12 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\FrontendUser;
-use Contao\PageModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
+use Webmozart\PathUtil\Path;
 
 class FilesController
 {
@@ -54,7 +54,7 @@ class FilesController
         }
 
         // Check whether the file exists
-        if (!is_file($this->rootDir.'/'.$file)) {
+        if (!is_file(Path::join($this->rootDir, $file))) {
             throw new PageNotFoundException();
         }
 
@@ -125,13 +125,6 @@ class FilesController
 
         // Deny access
         if (!$allowAccess) {
-            // Set the root page for the domain as the pageModel attribute
-            $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
-
-            if (null !== $root) {
-                $request->attributes->set('pageModel', $root);
-            }
-
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
             if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
                 throw new AccessDeniedException();
@@ -148,6 +141,6 @@ class FilesController
         @ini_set('max_execution_time', '0');
 
         // Return file to browser
-        return new BinaryFileResponse($this->rootDir.'/'.$file);
+        return new BinaryFileResponse(Path::join($this->rootDir, $file));
     }
 }
