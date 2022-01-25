@@ -120,7 +120,7 @@ class FilesController
         // Deny access
         if (!$allowAccess) {
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
-            if ($authenticated || !class_exists(InsufficientAuthenticationException::class)) {
+            if ($this->security->isGranted('ROLE_MEMBER')) {
                 throw new AccessDeniedException();
             }
 
