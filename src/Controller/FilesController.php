@@ -91,23 +91,26 @@ class FilesController
         $canAccessHomeDir = null !== $user && !empty($user->homeDir) && $user->accessHomeDir;
 
         do {
-            // Check if the current directory is an accessible user home
-            $isHomeDir = (bool) $this->db->fetchOne("SELECT id FROM tl_member WHERE accessHomeDir = 1 AND homeDir = ?", [$filesModel->uuid]);
+            // Check if this is a folder
+            if ('folder' === $filesModel->type) {
+                // Check if the current directory is an accessible user home
+                $isHomeDir = (bool) $this->db->fetchOne('SELECT COUNT(*) FROM tl_member WHERE accessHomeDir = 1 AND homeDir = ?', [$filesModel->uuid]);
 
-            // Only check for folders and when member groups have been set or the folder is a user home
-            if ('folder' === $filesModel->type && (null !== $filesModel->groups || $isHomeDir)) {
-                $allowLogin = true;
+                // Only check when member groups have been set or the folder is a user home
+                if (null !== $filesModel->groups || $isHomeDir) {
+                    $allowLogin = true;
 
-                // Set the model to protected on the fly
-                $filesModel->protected = true;
+                    // Set the model to protected on the fly
+                    $filesModel->protected = true;
 
-                // Check if this is the user's home directory
-                $isUserHomeDir = null !== $user && $user->homeDir === $filesModel->uuid;
+                    // Check if this is the user's home directory
+                    $isUserHomeDir = null !== $user && $user->homeDir === $filesModel->uuid;
 
-                // Check access
-                if (($canAccessHomeDir && $isUserHomeDir) || Controller::isVisibleElement($filesModel)) {
-                    $allowAccess = true;
-                    break;
+                    // Check access
+                    if (($canAccessHomeDir && $isUserHomeDir) || Controller::isVisibleElement($filesModel)) {
+                        $allowAccess = true;
+                        break;
+                    }
                 }
             }
 
