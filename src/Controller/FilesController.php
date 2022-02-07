@@ -19,6 +19,8 @@ use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
+use Contao\FrontendUser;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,13 +33,15 @@ class FilesController
     protected $session;
     protected $framework;
     protected $security;
+    protected $db;
 
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, Security $security)
+    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, Security $security, Connection $db)
     {
         $this->rootDir = $rootDir;
         $this->session = $session;
         $this->framework = $framework;
         $this->security = $security;
+        $this->db = $db;
     }
 
     public function fileAction(Request $request, string $file): BinaryFileResponse
@@ -74,18 +78,33 @@ class FilesController
         $allowLogin = false;
         $allowAccess = false;
 
+        // Get the current user
+        $user = $this->security->getUser();
+
+        // Check if the current user can access their home directory
+        $canAccessHomeDir = $user instanceof FrontendUser && !empty($user->homeDir) && $user->accessHomeDir;
+
         do {
-            // Only check for folders and when member groups have been set
-            if ('folder' === $filesModel->type && null !== $filesModel->groups) {
-                $allowLogin = true;
+            // Check if this is a folder
+            if ('folder' === $filesModel->type) {
+                // Check if the current directory is an accessible user home
+                $isHomeDir = (bool) $this->db->fetchOne('SELECT COUNT(*) FROM tl_member WHERE accessHomeDir = 1 AND homeDir = ?', [$filesModel->uuid]);
 
-                // Set the model to protected on the fly
-                $filesModel->protected = true;
+                // Only check when member groups have been set or the folder is a user home
+                if (null !== $filesModel->groups || $isHomeDir) {
+                    $allowLogin = true;
 
-                // Check access
-                if (Controller::isVisibleElement($filesModel)) {
-                    $allowAccess = true;
-                    break;
+                    // Set the model to protected on the fly
+                    $filesModel->protected = true;
+
+                    // Check if this is the user's home directory
+                    $isUserHomeDir = $user instanceof FrontendUser && $user->homeDir === $filesModel->uuid;
+
+                    // Check access
+                    if (($canAccessHomeDir && $isUserHomeDir) || Controller::isVisibleElement($filesModel)) {
+                        $allowAccess = true;
+                        break;
+                    }
                 }
             }
 
@@ -93,7 +112,7 @@ class FilesController
             $filesModel = FilesModel::findById($filesModel->pid);
         } while (null !== $filesModel);
 
-        // Throw 404 exception, if there were no folders with member groups
+        // Throw 404 exception, if there were no user homes or folders with member groups
         if (!$allowLogin) {
             throw new PageNotFoundException();
         }
