@@ -20,6 +20,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\FrontendUser;
+use Contao\PageModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -119,6 +120,13 @@ class FilesController
 
         // Deny access
         if (!$allowAccess) {
+            // Set the root page for the domain as the pageModel attribute
+            $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
+
+            if (null !== $root) {
+                $request->attributes->set('pageModel', $root);
+            }
+
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
             if ($this->security->isGranted('ROLE_MEMBER')) {
                 throw new AccessDeniedException();
