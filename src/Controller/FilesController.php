@@ -78,7 +78,7 @@ class FilesController
         }
 
         // Do not allow files that are not in the database or don't have a parent
-        if (null === $filesModel || null === $filesModel->pid) {
+        if (null === $filesModel || empty($filesModel->pid)) {
             throw new PageNotFoundException();
         }
 
