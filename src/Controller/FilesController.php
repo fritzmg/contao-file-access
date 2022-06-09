@@ -54,6 +54,9 @@ class FilesController
             throw new PageNotFoundException();
         }
 
+        // Initialize the Contao framework
+        $this->framework->initialize(true);
+
         // Set the root page for the domain as the pageModel attribute
         $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
 
@@ -65,9 +68,6 @@ class FilesController
         if (!is_file(Path::join($this->rootDir, $file))) {
             throw new PageNotFoundException();
         }
-
-        // Initialize the Contao framework
-        $this->framework->initialize(true);
 
         // Get FilesModel entity
         $filesModel = FilesModel::findOneByPath($file);
