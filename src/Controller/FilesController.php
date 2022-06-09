@@ -54,6 +54,13 @@ class FilesController
             throw new PageNotFoundException();
         }
 
+        // Set the root page for the domain as the pageModel attribute
+        $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
+
+        if (null !== $root) {
+            $request->attributes->set('pageModel', $root);
+        }
+
         // Check whether the file exists
         if (!is_file(Path::join($this->rootDir, $file))) {
             throw new PageNotFoundException();
@@ -120,13 +127,6 @@ class FilesController
 
         // Deny access
         if (!$allowAccess) {
-            // Set the root page for the domain as the pageModel attribute
-            $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
-
-            if (null !== $root) {
-                $request->attributes->set('pageModel', $root);
-            }
-
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
             if ($this->security->isGranted('ROLE_MEMBER')) {
                 throw new AccessDeniedException();
