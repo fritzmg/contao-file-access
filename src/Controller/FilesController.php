@@ -17,6 +17,8 @@ use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\InsufficientAuthenticationException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
+use Contao\Date;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\FrontendUser;
@@ -35,14 +37,16 @@ class FilesController
     protected $framework;
     protected $security;
     protected $db;
+    protected $tokenChecker;
 
-    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, Security $security, Connection $db)
+    public function __construct(string $rootDir, Session $session, ContaoFramework $framework, Security $security, Connection $db, TokenChecker $tokenChecker)
     {
         $this->rootDir = $rootDir;
         $this->session = $session;
         $this->framework = $framework;
         $this->security = $security;
         $this->db = $db;
+        $this->tokenChecker = $tokenChecker;
     }
 
     public function fileAction(Request $request, string $file): BinaryFileResponse
@@ -56,9 +60,9 @@ class FilesController
 
         // Initialize the Contao framework
         $this->framework->initialize(true);
-
+FilesModel::findById(null);
         // Set the root page for the domain as the pageModel attribute
-        $root = PageModel::findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
+        $root = $this->findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
 
         if (null !== $root) {
             $request->attributes->set('pageModel', $root);
@@ -117,7 +121,7 @@ class FilesController
             }
 
             // Get the parent folder
-            $filesModel = FilesModel::findById($filesModel->pid);
+            $filesModel = $filesModel->pid ? FilesModel::findById($filesModel->pid) : null;
         } while (null !== $filesModel);
 
         // Throw 404 exception, if there were no user homes or folders with member groups
@@ -144,5 +148,19 @@ class FilesController
 
         // Return file to browser
         return new BinaryFileResponse(Path::join($this->rootDir, $file));
+    }
+
+    protected function findFirstPublishedRootByHostAndLanguage(string $host, string $language): ?PageModel
+    {
+        $columns = ["type='root' AND (dns=? OR dns='') AND (language=? OR fallback='1')"];
+        $values = [$host, $language];
+        $options = ['order' => 'dns DESC, fallback'];
+
+        if (!$this->tokenChecker->isPreviewMode()) {
+            $time = Date::floorToMinute();
+            $columns[] = "published='1' AND (start='' OR start<='$time') AND (stop='' OR stop>'$time')";
+        }
+
+        return PageModel::findOneBy($columns, $values, $options);
     }
 }

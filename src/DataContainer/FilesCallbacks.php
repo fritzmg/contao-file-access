@@ -25,9 +25,14 @@ class FilesCallbacks
      */
     public function onLoadCallback(DataContainer $dc): void
     {
+        if (!$dc->id) {
+            return;
+        }
+
         if ('editAll' === Input::get('act') || (null !== ($filesModel = FilesModel::findOneByPath($dc->id)) && 'folder' === $filesModel->type)) {
             PaletteManipulator::create()
-                ->addField('groups', null)
+                // We have to use a non-existent legend here (see https://github.com/contao/contao/pull/5032)
+                ->addField('groups', 'foobar')
                 ->applyToPalette('default', 'tl_files')
             ;
         }
