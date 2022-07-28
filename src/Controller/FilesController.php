@@ -60,7 +60,7 @@ class FilesController
 
         // Initialize the Contao framework
         $this->framework->initialize(true);
-FilesModel::findById(null);
+
         // Set the root page for the domain as the pageModel attribute
         $root = $this->findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
 
