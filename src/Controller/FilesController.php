@@ -65,7 +65,9 @@ class FilesController
         $root = $this->findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
 
         if (null !== $root) {
+            $root->loadDetails();
             $request->attributes->set('pageModel', $root);
+            $GLOBALS['objPage'] = $root;
         }
 
         // Check whether the file exists
