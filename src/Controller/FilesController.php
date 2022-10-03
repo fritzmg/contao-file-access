@@ -154,13 +154,14 @@ class FilesController
 
     protected function findFirstPublishedRootByHostAndLanguage(string $host, string $language): ?PageModel
     {
-        $columns = ["type='root' AND (dns=? OR dns='') AND (language=? OR fallback='1')"];
+        $t = PageModel::getTable();
+        $columns = ["$t.type='root' AND ($t.dns=? OR $t.dns='') AND ($t.language=? OR $t.fallback='1')"];
         $values = [$host, $language];
-        $options = ['order' => 'dns DESC, fallback'];
+        $options = ['order' => "$t.dns DESC, $t.fallback"];
 
         if (!$this->tokenChecker->isPreviewMode()) {
             $time = Date::floorToMinute();
-            $columns[] = "published='1' AND (start='' OR start<='$time') AND (stop='' OR stop>'$time')";
+            $columns[] = "$t.published='1' AND ($t.start='' OR $t.start<='$time') AND ($t.stop='' OR $t.stop>'$time')";
         }
 
         return PageModel::findOneBy($columns, $values, $options);
