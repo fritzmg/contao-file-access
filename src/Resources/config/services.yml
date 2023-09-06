@@ -1,13 +1,20 @@
 services:
-  InspiredMinds\ContaoFileAccessBundle\Controller\FilesController:
-    arguments:
-      - '%kernel.project_dir%'
-      - '@session'
-      - '@contao.framework'
-      - '@security.helper'
-      - '@database_connection'
-      - '@contao.security.token_checker'
-    tags: ['controller.service_arguments']
+    _defaults:
+        autowire: true
+        autoconfigure: true
 
-  InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
-    autoconfigure: true
+    InspiredMinds\ContaoFileAccessBundle\Controller\FilesController:
+        arguments:
+            - '%kernel.project_dir%'
+            - '@session'
+            - '@contao.framework'
+            - '@security.helper'
+            - '@database_connection'
+            - '@contao.security.token_checker'
+        tags: ['controller.service_arguments']
+
+    InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
+        autoconfigure: true
+
+    InspiredMinds\ContaoFileAccessBundle\Image\ImageFactory:
+        decorates: contao.image.image_factory
