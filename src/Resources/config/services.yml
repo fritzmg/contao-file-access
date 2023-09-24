@@ -73,7 +73,7 @@ services:
             - routing.loader
 
     contao_file_access.image.protected_resizer:
-        class: Contao\CoreBundle\Image\LegacyResizer
+        class: Contao\CoreBundle\Image\Resizer
         arguments:
             - '%protected_image_cache_dir%'
             - '@contao.image.resize_calculator'
