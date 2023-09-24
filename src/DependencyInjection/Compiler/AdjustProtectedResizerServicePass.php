@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace InspiredMinds\ContaoFileAccessBundle\DependencyInjection\Compiler;
 
 use Contao\CoreBundle\Image\LegacyResizer;
-use Contao\CoreBundle\Image\Resizer;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -27,10 +26,9 @@ class AdjustProtectedResizerServicePass implements CompilerPassInterface
 
         $definition = $container->getDefinition('contao_file_access.image.protected_resizer');
 
+        // BC for Contao 4.13
         if (class_exists(LegacyResizer::class)) {
             $definition->setClass(LegacyResizer::class);
-        } else {
-            $definition->setClass(Resizer::class);
         }
     }
 }
