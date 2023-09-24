@@ -1,5 +1,5 @@
 parameters:
-    protected_image_cache_dir: '%kernel.project_dir%/protected_image_cache'
+    protected_images_cache_dir: '%kernel.project_dir%/protected_images_cache'
 
 services:
     _defaults:
@@ -30,8 +30,7 @@ services:
             - '@contao_file_access.image.protected_deferred_image_storage'
             - '@filesystem'
             - '@contao.framework'
-            - '@contao.routing.scope_matcher'
-            - '%protected_image_cache_dir%'
+            - '%protected_images_cache_dir%'
             - '%kernel.project_dir%'
         tags:
             - controller.service_arguments
@@ -45,11 +44,9 @@ services:
         arguments:
             - '@.inner'
             - '@contao_file_access.image.protected_resizer'
-            - '@request_stack'
-            - '@contao.routing.scope_matcher'
             - '%kernel.project_dir%'
             - '%contao.upload_path%'
-            - '%contao.backend.route_prefix%'
+            - '%protected_images_cache_dir%'
 
     contao_file_access.image.legacy_resizer:
         class: InspiredMinds\ContaoFileAccessBundle\Image\Resizer
@@ -58,24 +55,21 @@ services:
         arguments:
             - '@.inner'
             - '@contao_file_access.image.protected_resizer'
-            - '@request_stack'
-            - '@contao.routing.scope_matcher'
             - '%kernel.project_dir%'
             - '%contao.upload_path%'
-            - '%contao.backend.route_prefix%'
+            - '%protected_images_cache_dir%'
 
     InspiredMinds\ContaoFileAccessBundle\Routing\ProtectedImagesLoader:
         arguments:
             - '%kernel.project_dir%'
-            - '%protected_image_cache_dir%'
-            - '%contao.backend.route_prefix%'
+            - '%protected_images_cache_dir%'
         tags:
             - routing.loader
 
     contao_file_access.image.protected_resizer:
         class: Contao\CoreBundle\Image\LegacyResizer
         arguments:
-            - '%protected_image_cache_dir%'
+            - '%protected_images_cache_dir%'
             - '@contao.image.resize_calculator'
             - '@filesystem'
             - '@contao_file_access.image.protected_deferred_image_storage'
@@ -83,7 +77,7 @@ services:
     contao_file_access.image.protected_deferred_image_storage:
         class: Contao\Image\DeferredImageStorageFilesystem
         arguments:
-            - '%protected_image_cache_dir%'
+            - '%protected_images_cache_dir%'
             - '@?filesystem'
 
     contao_file_access.image.protected_factory:

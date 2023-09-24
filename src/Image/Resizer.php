@@ -12,54 +12,53 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoFileAccessBundle\Image;
 
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\FilesModel;
 use Contao\Folder;
-use Contao\Image\DeferredImage;
 use Contao\Image\DeferredImageInterface;
 use Contao\Image\DeferredResizerInterface;
 use Contao\Image\ImageInterface;
 use Contao\Image\ResizeConfiguration;
 use Contao\Image\ResizeOptions;
 use Imagine\Image\ImagineInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Webmozart\PathUtil\Path;
 
 class Resizer implements DeferredResizerInterface
 {
     private $inner;
     private $protectedResizer;
-    private $requestStack;
-    private $scopeMatcher;
     private $projectDir;
     private $uploadPath;
-    private $backendRoutePrefix;
+    private $protectedCacheDir;
 
     public function __construct(
         DeferredResizerInterface $inner,
         DeferredResizerInterface $protectedResizer,
-        RequestStack $requestStack,
-        ScopeMatcher $scopeMatcher,
         string $projectDir,
         string $uploadPath,
-        string $backendRoutePrefix
+        string $protectedCacheDir
     ) {
         $this->inner = $inner;
         $this->protectedResizer = $protectedResizer;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
         $this->projectDir = $projectDir;
         $this->uploadPath = $uploadPath;
-        $this->backendRoutePrefix = $backendRoutePrefix;
+        $this->protectedCacheDir = $protectedCacheDir;
     }
 
     public function getDeferredImage(string $targetPath, ImagineInterface $imagine): ?DeferredImageInterface
     {
+        if (Path::isBasePath($this->protectedCacheDir, $targetPath)) {
+            return $this->protectedResizer->getDeferredImage($targetPath, $imagine);
+        }
+
         return $this->inner->getDeferredImage($targetPath, $imagine);
     }
 
     public function resizeDeferredImage(DeferredImageInterface $image, bool $blocking = true): ?ImageInterface
     {
+        if (Path::isBasePath($this->protectedCacheDir, $image->getPath())) {
+            return $this->protectedResizer->resizeDeferredImage($image, $blocking);
+        }
+
         return $this->inner->resizeDeferredImage($image, $blocking);
     }
 
@@ -68,21 +67,7 @@ class Resizer implements DeferredResizerInterface
         $relImageDir = Path::makeRelative(\dirname($image->getPath()), $this->projectDir);
 
         if ($this->isResizedImagesProtected($relImageDir)) {
-            $resized = $this->protectedResizer->resize($image, $config, $options);
-            $request = $this->requestStack->getCurrentRequest();
-
-            // Modify the image path for the back end
-            if ($request && $this->scopeMatcher->isBackendRequest($request)) {
-                $backendPath = Path::join($this->projectDir, $this->backendRoutePrefix, Path::makeRelative($resized->getPath(), $this->projectDir));
-
-                return new DeferredImage(
-                    $backendPath,
-                    $resized->getImagine(),
-                    $resized->getDimensions()
-                );
-            }
-
-            return $resized;
+            return $this->protectedResizer->resize($image, $config, $options);
         }
 
         return $this->inner->resize($image, $config, $options);

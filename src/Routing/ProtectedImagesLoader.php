@@ -20,16 +20,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ProtectedImagesLoader extends Loader
 {
-    private string $frontendPathPrefix;
-    private string $backendPathPrefix;
+    private string $pathPrefix;
 
     /**
      * @internal
      */
-    public function __construct(string $projectDir, string $imageTargetDir, string $backendRoutePrefix)
+    public function __construct(string $projectDir, string $imageTargetDir)
     {
-        $this->frontendPathPrefix = Path::makeRelative($imageTargetDir, $projectDir);
-        $this->backendPathPrefix = Path::join($backendRoutePrefix, $this->frontendPathPrefix);
+        $this->pathPrefix = Path::makeRelative($imageTargetDir, $projectDir);
     }
 
     public function load($resource, string $type = null): RouteCollection
@@ -37,19 +35,10 @@ class ProtectedImagesLoader extends Loader
         $routes = new RouteCollection();
 
         $routes->add('contao_file_access_protected_images', new Route(
-            '/'.$this->frontendPathPrefix.'/{path}',
+            '/'.$this->pathPrefix.'/{path}',
             [
                 '_controller' => ProtectedImagesController::class,
                 '_scope' => 'frontend',
-            ],
-            ['path' => '.+']
-        ));
-
-        $routes->add('contao_file_access_protected_images_backend', new Route(
-            $this->backendPathPrefix.'/{path}',
-            [
-                '_controller' => ProtectedImagesController::class,
-                '_scope' => 'backend',
             ],
             ['path' => '.+']
         ));

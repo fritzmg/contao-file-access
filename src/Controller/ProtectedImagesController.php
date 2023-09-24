@@ -15,7 +15,6 @@ namespace InspiredMinds\ContaoFileAccessBundle\Controller;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Image\ImageFactoryInterface;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\Image\DeferredImageInterface;
@@ -35,7 +34,6 @@ class ProtectedImagesController extends AbstractFilesController
     private DeferredImageStorageInterface $deferredImageStorage;
     private Filesystem $filesystem;
     private ContaoFramework $framework;
-    private ScopeMatcher $scopeMatcher;
     private string $targetDir;
     private string $projectDir;
 
@@ -45,7 +43,6 @@ class ProtectedImagesController extends AbstractFilesController
         DeferredImageStorageInterface $deferredImageStorage,
         Filesystem $filesystem,
         ContaoFramework $framework,
-        ScopeMatcher $scopeMatcher,
         string $targetDir,
         string $projectDir
     ) {
@@ -54,7 +51,6 @@ class ProtectedImagesController extends AbstractFilesController
         $this->deferredImageStorage = $deferredImageStorage;
         $this->filesystem = $filesystem;
         $this->framework = $framework;
-        $this->scopeMatcher = $scopeMatcher;
         $this->targetDir = $targetDir;
         $this->projectDir = $projectDir;
     }
@@ -96,7 +92,7 @@ class ProtectedImagesController extends AbstractFilesController
         }
 
         // Check the permissions
-        if (!$this->scopeMatcher->isBackendRequest($request)) {
+        if (!$this->tokenChecker()->hasBackendUser()) {
             $this->checkFilePermissions($filesModel);
         }
 
