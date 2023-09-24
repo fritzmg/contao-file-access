@@ -21,7 +21,7 @@ use Contao\Image\ResizeOptions;
 use Imagine\Image\ImagineInterface;
 use Webmozart\PathUtil\Path;
 
-class LegacyResizer implements DeferredResizerInterface
+class Resizer implements DeferredResizerInterface
 {
     private $inner;
     private $protectedResizer;

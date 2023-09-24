@@ -17,7 +17,6 @@ use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
-use Contao\Folder;
 use Contao\Input;
 use Webmozart\PathUtil\Path;
 
@@ -40,7 +39,7 @@ class FilesCallbacks
         }
 
         if ('editAll' === Input::get('act')) {
-            $this->addGroups();
+            $this->adjustPalette();
 
             return;
         }
@@ -55,11 +54,7 @@ class FilesCallbacks
             return;
         }
 
-        if ((new Folder($dc->id))->isUnprotected()) {
-            return;
-        }
-
-        $this->addGroups();
+        $this->adjustPalette();
     }
 
     /**
@@ -74,11 +69,12 @@ class FilesCallbacks
         return $value;
     }
 
-    private function addGroups(): void
+    private function adjustPalette(): void
     {
         PaletteManipulator::create()
             // We have to use a non-existent legend here (see https://github.com/contao/contao/pull/5032)
             ->addField('groups', 'foobar')
+            ->addField('protectResizedImages', 'foobar')
             ->applyToPalette('default', 'tl_files')
         ;
     }

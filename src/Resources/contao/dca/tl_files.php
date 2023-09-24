@@ -21,3 +21,11 @@ $GLOBALS['TL_DCA']['tl_files']['fields']['groups'] = [
     'sql' => 'blob NULL',
     'relation' => ['type' => 'hasMany', 'load' => 'lazy'],
 ];
+
+$GLOBALS['TL_DCA']['tl_files']['fields']['protectResizedImages'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_files']['protectResizedImages'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'eval' => ['tl_class' => 'clr'],
+    'sql' => "char(1) NOT NULL default ''",
+];

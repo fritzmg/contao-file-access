@@ -12,14 +12,14 @@ services:
             calls:
                 - [setFramework, ['@contao.framework']]
 
+        InspiredMinds\ContaoFileAccessBundle\Controller\AbstractFilesController:
+            calls:
+                - [setContainer, ['@Psr\Container\ContainerInterface']]
+
     InspiredMinds\ContaoFileAccessBundle\Controller\FilesController:
         arguments:
-            - '%kernel.project_dir%'
-            - '@session'
             - '@contao.framework'
-            - '@security.helper'
-            - '@database_connection'
-            - '@contao.security.token_checker'
+            - '%kernel.project_dir%'
         tags:
             - controller.service_arguments
 
@@ -27,15 +27,17 @@ services:
         arguments:
             - '@contao_file_access.image.protected_factory'
             - '@contao_file_access.image.protected_resizer'
+            - '@contao_file_access.image.protected_deferred_image_storage'
+            - '@contao.framework'
             - '%protected_image_cache_dir%'
-            - '@?filesystem'
+            - '%kernel.project_dir%'
         tags:
             - controller.service_arguments
 
     InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
         autowire: true
 
-    InspiredMinds\ContaoFileAccessBundle\Image\LegacyResizer:
+    InspiredMinds\ContaoFileAccessBundle\Image\Resizer:
         decorates: contao.image.legacy_resizer
         arguments:
             - '@.inner'
@@ -56,9 +58,9 @@ services:
             - '%protected_image_cache_dir%'
             - '@contao.image.resize_calculator'
             - '@filesystem'
-            - '@contao_file_access.image.contao_deferred_image_storage'
+            - '@contao_file_access.image.protected_deferred_image_storage'
 
-    contao_file_access.image.contao_deferred_image_storage:
+    contao_file_access.image.protected_deferred_image_storage:
         class: Contao\Image\DeferredImageStorageFilesystem
         arguments:
             - '%protected_image_cache_dir%'

@@ -12,49 +12,108 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoFileAccessBundle\Controller;
 
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Image\ImageFactoryInterface;
+use Contao\Dbafs;
+use Contao\FilesModel;
 use Contao\Image\DeferredImageInterface;
+use Contao\Image\DeferredImageStorageInterface;
 use Contao\Image\DeferredResizerInterface;
 use Contao\Image\Exception\FileNotExistsException;
-use Contao\Image\ResizerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Webmozart\PathUtil\Path;
 
-class ProtectedImagesController
+class ProtectedImagesController extends AbstractFilesController
 {
     private ImageFactoryInterface $imageFactory;
-    private ResizerInterface $resizer;
+    private DeferredResizerInterface $resizer;
+    private DeferredImageStorageInterface $deferredImageStorage;
+    private ContaoFramework $framework;
     private string $targetDir;
-    private Filesystem $filesystem;
+    private string $projectDir;
 
-    public function __construct(ImageFactoryInterface $imageFactory, ResizerInterface $resizer, string $targetDir, Filesystem $filesystem = null)
-    {
+    public function __construct(
+        ImageFactoryInterface $imageFactory,
+        DeferredResizerInterface $resizer,
+        DeferredImageStorageInterface $deferredImageStorage,
+        ContaoFramework $framework,
+        string $targetDir,
+        string $projectDir
+    ) {
         $this->imageFactory = $imageFactory;
         $this->resizer = $resizer;
+        $this->deferredImageStorage = $deferredImageStorage;
+        $this->framework = $framework;
         $this->targetDir = $targetDir;
-        $this->filesystem = $filesystem ?? new Filesystem();
+        $this->projectDir = $projectDir;
     }
 
-    public function __invoke(string $path): Response
+    public function __invoke(Request $request, string $path): Response
     {
+        try {
+            $config = $this->deferredImageStorage->get($path);
+        } catch (\Throwable $e) {
+            throw new PageNotFoundException('Cannot retrieve deferred image information.', 0, $e);
+        }
+
+        $filePath = Path::join($this->targetDir, $config['path']);
+
+        // Initialize the Contao framework
+        $this->framework->initialize(true);
+
+        // Set the root page for the domain as the pageModel attribute
+        $this->setRootPage($request);
+
+        // Check whether the file exists
+        if (!is_file($filePath)) {
+            throw new PageNotFoundException();
+        }
+
+        $relativeFilePath = Path::makeRelative($filePath, $this->projectDir);
+
+        // Get FilesModel entity
+        $filesModel = FilesModel::findOneByPath($relativeFilePath);
+
+        // Dynamically add the file to the DBAFS
+        if (null === $filesModel) {
+            $filesModel = Dbafs::addResource($relativeFilePath);
+        }
+
+        // Do not allow files that are not in the database or don't have a parent
+        if (null === $filesModel || empty($filesModel->pid)) {
+            throw new PageNotFoundException();
+        }
+
+        // Check the permissions
+        $this->checkFilePermissions($filesModel);
+
         try {
             try {
                 $image = $this->imageFactory->create(Path::join($this->targetDir, $path));
             } catch (\InvalidArgumentException $exception) {
-                throw new NotFoundHttpException($exception->getMessage(), $exception);
+                throw new PageNotFoundException($exception->getMessage(), 0, $exception);
             }
 
-            if ($image instanceof DeferredImageInterface && $this->resizer instanceof DeferredResizerInterface) {
+            if ($image instanceof DeferredImageInterface) {
                 $this->resizer->resizeDeferredImage($image);
-            } elseif (!$this->filesystem->exists($image->getPath())) {
-                throw new NotFoundHttpException('Image does not exist');
+
+                // Re-save deferred image info (not ideal)
+                $this->deferredImageStorage->set($path, $config);
+            } else {
+                throw new PageNotFoundException('Image must have deferred config.');
             }
         } catch (FileNotExistsException $exception) {
-            throw new NotFoundHttpException($exception->getMessage(), $exception);
+            throw new PageNotFoundException($exception->getMessage(), 0, $exception);
         }
+
+        // Close the session
+        $request->getSession()->save();
+
+        // Try to override max_execution_time
+        @ini_set('max_execution_time', '0');
 
         return new BinaryFileResponse($image->getPath(), 200, ['Cache-Control' => 'private, max-age=31536000'], false);
     }
