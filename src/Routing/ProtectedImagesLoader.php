@@ -40,17 +40,15 @@ class ProtectedImagesLoader extends Loader
             '/'.$this->frontendPathPrefix.'/{path}',
             [
                 '_controller' => ProtectedImagesController::class,
-                '_bypass_maintenance' => true,
                 '_scope' => 'frontend',
             ],
             ['path' => '.+']
         ));
 
-        $routes->add('contao_files_access_protected_images_backend', new Route(
+        $routes->add('contao_file_access_protected_images_backend', new Route(
             $this->backendPathPrefix.'/{path}',
             [
                 '_controller' => ProtectedImagesController::class,
-                '_bypass_maintenance' => true,
                 '_scope' => 'backend',
             ],
             ['path' => '.+']
