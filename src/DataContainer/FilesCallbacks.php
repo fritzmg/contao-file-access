@@ -17,6 +17,7 @@ use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\FilesModel;
+use Contao\Folder;
 use Contao\Input;
 use Webmozart\PathUtil\Path;
 
@@ -51,6 +52,10 @@ class FilesCallbacks
         }
 
         if (null === $filesModel || 'folder' !== $filesModel->type) {
+            return;
+        }
+
+        if ((new Folder($dc->id))->isUnprotected()) {
             return;
         }
 
