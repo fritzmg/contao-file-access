@@ -20,29 +20,41 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ProtectedImagesLoader extends Loader
 {
-    private string $pathPrefix;
+    private string $frontendPathPrefix;
+    private string $backendPathPrefix;
 
     /**
      * @internal
      */
-    public function __construct(string $projectDir, string $imageTargetDir)
+    public function __construct(string $projectDir, string $imageTargetDir, string $backendRoutePrefix)
     {
-        $this->pathPrefix = Path::makeRelative($imageTargetDir, $projectDir);
+        $this->frontendPathPrefix = Path::makeRelative($imageTargetDir, $projectDir);
+        $this->backendPathPrefix = Path::join($backendRoutePrefix, $this->frontendPathPrefix);
     }
 
     public function load($resource, string $type = null): RouteCollection
     {
-        $route = new Route(
-            '/'.$this->pathPrefix.'/{path}',
+        $routes = new RouteCollection();
+
+        $routes->add('contao_file_access_protected_images', new Route(
+            '/'.$this->frontendPathPrefix.'/{path}',
             [
                 '_controller' => ProtectedImagesController::class,
                 '_bypass_maintenance' => true,
+                '_scope' => 'frontend',
             ],
             ['path' => '.+']
-        );
+        ));
 
-        $routes = new RouteCollection();
-        $routes->add('contao_file_access_protected_images', $route);
+        $routes->add('contao_files_access_protected_images_backend', new Route(
+            $this->backendPathPrefix.'/{path}',
+            [
+                '_controller' => ProtectedImagesController::class,
+                '_bypass_maintenance' => true,
+                '_scope' => 'backend',
+            ],
+            ['path' => '.+']
+        ));
 
         return $routes;
     }

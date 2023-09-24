@@ -28,7 +28,9 @@ services:
             - '@contao_file_access.image.protected_factory'
             - '@contao_file_access.image.protected_resizer'
             - '@contao_file_access.image.protected_deferred_image_storage'
+            - '@filesystem'
             - '@contao.framework'
+            - '@contao.routing.scope_matcher'
             - '%protected_image_cache_dir%'
             - '%kernel.project_dir%'
         tags:
@@ -37,18 +39,36 @@ services:
     InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
         autowire: true
 
-    InspiredMinds\ContaoFileAccessBundle\Image\Resizer:
-        decorates: contao.image.legacy_resizer
+    contao_file_access.image.resizer:
+        class: InspiredMinds\ContaoFileAccessBundle\Image\Resizer
+        decorates: contao.image.resizer
         arguments:
             - '@.inner'
             - '@contao_file_access.image.protected_resizer'
+            - '@request_stack'
+            - '@contao.routing.scope_matcher'
             - '%kernel.project_dir%'
             - '%contao.upload_path%'
+            - '%contao.backend.route_prefix%'
+
+    contao_file_access.image.legacy_resizer:
+        class: InspiredMinds\ContaoFileAccessBundle\Image\Resizer
+        decorates: contao.image.legacy_resizer
+        decoration_on_invalid: ignore
+        arguments:
+            - '@.inner'
+            - '@contao_file_access.image.protected_resizer'
+            - '@request_stack'
+            - '@contao.routing.scope_matcher'
+            - '%kernel.project_dir%'
+            - '%contao.upload_path%'
+            - '%contao.backend.route_prefix%'
 
     InspiredMinds\ContaoFileAccessBundle\Routing\ProtectedImagesLoader:
         arguments:
             - '%kernel.project_dir%'
             - '%protected_image_cache_dir%'
+            - '%contao.backend.route_prefix%'
         tags:
             - routing.loader
 

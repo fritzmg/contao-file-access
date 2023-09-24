@@ -15,12 +15,14 @@ namespace InspiredMinds\ContaoFileAccessBundle\Controller;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Image\ImageFactoryInterface;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\Image\DeferredImageInterface;
 use Contao\Image\DeferredImageStorageInterface;
 use Contao\Image\DeferredResizerInterface;
 use Contao\Image\Exception\FileNotExistsException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +33,9 @@ class ProtectedImagesController extends AbstractFilesController
     private ImageFactoryInterface $imageFactory;
     private DeferredResizerInterface $resizer;
     private DeferredImageStorageInterface $deferredImageStorage;
+    private Filesystem $filesystem;
     private ContaoFramework $framework;
+    private ScopeMatcher $scopeMatcher;
     private string $targetDir;
     private string $projectDir;
 
@@ -39,14 +43,18 @@ class ProtectedImagesController extends AbstractFilesController
         ImageFactoryInterface $imageFactory,
         DeferredResizerInterface $resizer,
         DeferredImageStorageInterface $deferredImageStorage,
+        Filesystem $filesystem,
         ContaoFramework $framework,
+        ScopeMatcher $scopeMatcher,
         string $targetDir,
         string $projectDir
     ) {
         $this->imageFactory = $imageFactory;
         $this->resizer = $resizer;
         $this->deferredImageStorage = $deferredImageStorage;
+        $this->filesystem = $filesystem;
         $this->framework = $framework;
+        $this->scopeMatcher = $scopeMatcher;
         $this->targetDir = $targetDir;
         $this->projectDir = $projectDir;
     }
@@ -88,7 +96,9 @@ class ProtectedImagesController extends AbstractFilesController
         }
 
         // Check the permissions
-        $this->checkFilePermissions($filesModel);
+        if (!$this->scopeMatcher->isBackendRequest($request)) {
+            $this->checkFilePermissions($filesModel);
+        }
 
         try {
             try {
@@ -102,8 +112,8 @@ class ProtectedImagesController extends AbstractFilesController
 
                 // Re-save deferred image info (not ideal)
                 $this->deferredImageStorage->set($path, $config);
-            } else {
-                throw new PageNotFoundException('Image must have deferred config.');
+            } elseif (!$this->filesystem->exists($image->getPath())) {
+                throw new PageNotFoundException('Image does not exist');
             }
         } catch (FileNotExistsException $exception) {
             throw new PageNotFoundException($exception->getMessage(), 0, $exception);
