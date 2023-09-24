@@ -27,12 +27,16 @@
     ],
     "require": {
         "php": "^7.1 || ^8.0",
-        "contao/core-bundle": "^4.9 || ^5.0",
-        "symfony/config": "^4.4 || ^5.2 || ^6.0",
-        "symfony/dependency-injection": "^4.4 || ^5.2 || ^6.0",
-        "symfony/http-foundation": "^4.4 || ^5.2 || ^6.0", 
-        "symfony/http-kernel": "^4.4 || ^5.2 || ^6.0",
+        "contao/core-bundle": "^4.13",
+        "contao/image": "^1.2",
+        "symfony/config": "^5.2 || ^6.0",
+        "symfony/dependency-injection": "^5.2 || ^6.0",
+        "symfony/http-foundation": "^5.2 || ^6.0", 
+        "symfony/http-kernel": "^5.2 || ^6.0",
         "webmozart/path-util": "^2.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0"
     },
     "autoload": {
         "psr-4": {
