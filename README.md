@@ -45,8 +45,8 @@ contao_file_access:
 Note that this will however put additional load on your application as all requests to any resized protected image must
 be processed by the application.
 
-Also note that due to technical limitations you will always have access to these images if you are logged into the back
-end in your current browser session.
+Also note that due to technical limitations you will always have access to these images (i.e. see these images) if you
+are logged into the back end in your current browser session.
 
 ## Important Notes
 
