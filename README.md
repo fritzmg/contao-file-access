@@ -42,6 +42,12 @@ contao_file_access:
     protect_resized_images: true
 ```
 
+Note that this will however put additional load on your application as all requests to any resized protected image must
+be processed by the application.
+
+Also note that due to technical limitations you will always have access to these images if you are logged into the back
+end in your current browser session.
+
 ## Important Notes
 
 Since this access restriction is done via PHP, the file is also sent to the client via PHP. This means that the `max_execution_time` needs to be sufficiently large, so that any file can be transferred to the client before the script is terminated. Thus you should be aware that problems can occur if a file is either very large or the client's connection to the server is very slow, or both. The script tries to disable the `max_execution_time`, though there is no guarantee that this will work. Also there can be other timeouts in the webserver.
