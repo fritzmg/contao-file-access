@@ -22,6 +22,11 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 class ContaoFileAccessExtension extends Extension
 {
+    public function getConfiguration(array $config, ContainerBuilder $container): Configuration
+    {
+        return new Configuration((string) $container->getParameter('kernel.project_dir'));
+    }
+
     /**
      * Loads a specific configuration.
      *
@@ -29,6 +34,12 @@ class ContaoFileAccessExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $configuration = new Configuration((string) $container->getParameter('kernel.project_dir'));
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('contao_file_access.protected_images_cache', $config['protected_images_cache']);
+        $container->setParameter('contao_file_access.protect_resized_images', $config['protect_resized_images']);
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

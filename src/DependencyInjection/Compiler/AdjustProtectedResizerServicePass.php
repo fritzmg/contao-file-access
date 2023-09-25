@@ -24,12 +24,14 @@ class AdjustProtectedResizerServicePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if ($container->has('contao_file_access.image.protected_resizer')) {
-            $definition = $container->getDefinition('contao_file_access.image.protected_resizer');
+        if (!$container->has('contao_file_access.image.protected_resizer')) {
+            return;
+        }
 
-            if (!class_exists(LegacyResizer::class)) {
-                $definition->setClass(Resizer::class);
-            }
+        $definition = $container->getDefinition('contao_file_access.image.protected_resizer');
+
+        if (!class_exists(LegacyResizer::class)) {
+            $definition->setClass(Resizer::class);
         }
     }
 }

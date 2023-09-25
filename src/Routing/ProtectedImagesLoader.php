@@ -22,9 +22,6 @@ class ProtectedImagesLoader extends Loader
 {
     private string $pathPrefix;
 
-    /**
-     * @internal
-     */
     public function __construct(string $projectDir, string $imageTargetDir)
     {
         $this->pathPrefix = Path::makeRelative($imageTargetDir, $projectDir);

@@ -79,7 +79,6 @@ class FilesCallbacks
         PaletteManipulator::create()
             // We have to use a non-existent legend here (see https://github.com/contao/contao/pull/5032)
             ->addField('groups', 'foobar')
-            ->addField('protectResizedImages', 'foobar')
             ->applyToPalette('default', 'tl_files')
         ;
     }

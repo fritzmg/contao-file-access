@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoFileAccessBundle\Image;
 
-use Contao\FilesModel;
 use Contao\Folder;
 use Contao\Image\DeferredImageInterface;
 use Contao\Image\DeferredResizerInterface;
@@ -75,16 +74,6 @@ class Resizer implements DeferredResizerInterface
 
     private function isResizedImagesProtected(string $relImageDir): bool
     {
-        if (!Path::isBasePath($this->uploadPath, $relImageDir) || (new Folder($relImageDir))->isUnprotected()) {
-            return false;
-        }
-
-        $filesModel = FilesModel::findByPath($relImageDir);
-
-        if (null === $filesModel) {
-            return false;
-        }
-
-        return (bool) $filesModel->protectResizedImages;
+        return Path::isBasePath($this->uploadPath, $relImageDir) && !(new Folder($relImageDir))->isUnprotected();
     }
 }
