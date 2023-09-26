@@ -1,13 +1,95 @@
 services:
-  InspiredMinds\ContaoFileAccessBundle\Controller\FilesController:
-    arguments:
-      - '%kernel.project_dir%'
-      - '@session'
-      - '@contao.framework'
-      - '@security.helper'
-      - '@database_connection'
-      - '@contao.security.token_checker'
-    tags: ['controller.service_arguments']
+    _defaults:
+        autoconfigure: true
+        bind:
+            $projectDir: '%kernel.project_dir%'
 
-  InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
-    autoconfigure: true
+    _instanceof:
+        Contao\CoreBundle\Framework\FrameworkAwareInterface:
+            calls:
+                - [setFramework, ['@contao.framework']]
+
+        InspiredMinds\ContaoFileAccessBundle\Controller\AbstractFilesController:
+            calls:
+                - [setContainer, ['@Psr\Container\ContainerInterface']]
+
+    InspiredMinds\ContaoFileAccessBundle\Controller\FilesController:
+        arguments:
+            - '@contao.framework'
+            - '%kernel.project_dir%'
+        tags:
+            - controller.service_arguments
+
+    InspiredMinds\ContaoFileAccessBundle\Controller\ProtectedImagesController:
+        arguments:
+            - '@contao_file_access.image.protected_factory'
+            - '@contao_file_access.image.protected_resizer'
+            - '@contao_file_access.image.protected_deferred_image_storage'
+            - '@filesystem'
+            - '@contao.framework'
+            - '%contao_file_access.protected_images_cache%'
+            - '%kernel.project_dir%'
+        tags:
+            - controller.service_arguments
+
+    InspiredMinds\ContaoFileAccessBundle\DataContainer\FilesCallbacks:
+        autowire: true
+
+    contao_file_access.image.resizer:
+        class: InspiredMinds\ContaoFileAccessBundle\Image\Resizer
+        decorates: contao.image.resizer
+        arguments:
+            - '@.inner'
+            - '@contao_file_access.image.protected_resizer'
+            - '%kernel.project_dir%'
+            - '%contao.upload_path%'
+            - '%contao_file_access.protected_images_cache%'
+
+    contao_file_access.image.legacy_resizer:
+        class: InspiredMinds\ContaoFileAccessBundle\Image\Resizer
+        decorates: contao.image.legacy_resizer
+        decoration_on_invalid: ignore
+        arguments:
+            - '@.inner'
+            - '@contao_file_access.image.protected_resizer'
+            - '%kernel.project_dir%'
+            - '%contao.upload_path%'
+            - '%contao_file_access.protected_images_cache%'
+
+    InspiredMinds\ContaoFileAccessBundle\Routing\ProtectedImagesLoader:
+        arguments:
+            - '%kernel.project_dir%'
+            - '%contao_file_access.protected_images_cache%'
+        tags:
+            - routing.loader
+
+    contao_file_access.image.protected_resizer:
+        class: Contao\CoreBundle\Image\LegacyResizer
+        arguments:
+            - '%contao_file_access.protected_images_cache%'
+            - '@contao.image.resize_calculator'
+            - '@filesystem'
+            - '@contao_file_access.image.protected_deferred_image_storage'
+
+    contao_file_access.image.protected_deferred_image_storage:
+        class: Contao\Image\DeferredImageStorageFilesystem
+        arguments:
+            - '%contao_file_access.protected_images_cache%'
+            - '@?filesystem'
+
+    contao_file_access.image.protected_factory:
+        class: Contao\CoreBundle\Image\ImageFactory
+        public: true
+        arguments:
+            - '@contao_file_access.image.protected_resizer'
+            - '@contao.image.imagine'
+            - '@contao.image.imagine_svg'
+            - '@filesystem'
+            - '@contao.framework'
+            - '%contao.image.bypass_cache%'
+            - '%contao.image.imagine_options%'
+            - '%contao.image.valid_extensions%'
+            - '%kernel.project_dir%/%contao.upload_path%'
+            - '@?logger'
+        tags:
+            - { name: monolog.logger, channel: contao.error }

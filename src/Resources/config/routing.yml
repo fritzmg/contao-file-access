@@ -6,3 +6,7 @@ files:
     _token_check: true
   requirements:
     file: .+
+
+protected_images:
+  resource: .
+  type: protected_images
