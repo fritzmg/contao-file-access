@@ -40,7 +40,7 @@ class ContaoFileAccessExtension extends Extension
         $container->setParameter('contao_file_access.protected_images_cache', $config['protected_images_cache']);
         $container->setParameter('contao_file_access.protect_resized_images', $config['protect_resized_images']);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
+        $loader->load('services.yaml');
     }
 }
