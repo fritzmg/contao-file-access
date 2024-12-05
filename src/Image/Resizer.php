@@ -19,31 +19,20 @@ use Contao\Image\ImageInterface;
 use Contao\Image\ResizeConfiguration;
 use Contao\Image\ResizeOptions;
 use Imagine\Image\ImagineInterface;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 class Resizer implements DeferredResizerInterface
 {
-    private $inner;
-    private $protectedResizer;
-    private $projectDir;
-    private $uploadPath;
-    private $protectedCacheDir;
-
     public function __construct(
-        DeferredResizerInterface $inner,
-        DeferredResizerInterface $protectedResizer,
-        string $projectDir,
-        string $uploadPath,
-        string $protectedCacheDir
+        private readonly DeferredResizerInterface $inner,
+        private readonly DeferredResizerInterface $protectedResizer,
+        private readonly string $projectDir,
+        private readonly string $uploadPath,
+        private readonly string $protectedCacheDir,
     ) {
-        $this->inner = $inner;
-        $this->protectedResizer = $protectedResizer;
-        $this->projectDir = $projectDir;
-        $this->uploadPath = $uploadPath;
-        $this->protectedCacheDir = $protectedCacheDir;
     }
 
-    public function getDeferredImage(string $targetPath, ImagineInterface $imagine): ?DeferredImageInterface
+    public function getDeferredImage(string $targetPath, ImagineInterface $imagine): DeferredImageInterface|null
     {
         if (Path::isBasePath($this->protectedCacheDir, $targetPath)) {
             return $this->protectedResizer->getDeferredImage($targetPath, $imagine);
@@ -52,7 +41,7 @@ class Resizer implements DeferredResizerInterface
         return $this->inner->getDeferredImage($targetPath, $imagine);
     }
 
-    public function resizeDeferredImage(DeferredImageInterface $image, bool $blocking = true): ?ImageInterface
+    public function resizeDeferredImage(DeferredImageInterface $image, bool $blocking = true): ImageInterface|null
     {
         if (Path::isBasePath($this->protectedCacheDir, $image->getPath())) {
             return $this->protectedResizer->resizeDeferredImage($image, $blocking);

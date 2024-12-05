@@ -20,14 +20,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ProtectedImagesLoader extends Loader
 {
-    private string $pathPrefix;
+    private readonly string $pathPrefix;
 
     public function __construct(string $projectDir, string $imageTargetDir)
     {
         $this->pathPrefix = Path::makeRelative($imageTargetDir, $projectDir);
     }
 
-    public function load($resource, string $type = null): RouteCollection
+    public function load($resource, string|null $type = null): RouteCollection
     {
         $routes = new RouteCollection();
 
@@ -37,13 +37,13 @@ class ProtectedImagesLoader extends Loader
                 '_controller' => ProtectedImagesController::class,
                 '_scope' => 'frontend',
             ],
-            ['path' => '.+']
+            ['path' => '.+'],
         ));
 
         return $routes;
     }
 
-    public function supports($resource, string $type = null): bool
+    public function supports($resource, string|null $type = null): bool
     {
         return 'protected_images' === $type;
     }

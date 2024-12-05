@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the ContaoFileAccessBundle.
+ * This file is part of the Contao File Access extension.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -14,15 +14,12 @@ namespace InspiredMinds\ContaoFileAccessBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 class Configuration implements ConfigurationInterface
 {
-    private string $projectDir;
-
-    public function __construct(string $projectDir)
+    public function __construct(private readonly string $projectDir)
     {
-        $this->projectDir = $projectDir;
     }
 
     public function getConfigTreeBuilder(): TreeBuilder

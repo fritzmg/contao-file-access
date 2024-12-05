@@ -99,7 +99,7 @@ abstract class AbstractFilesController implements ServiceSubscriberInterface
     {
         $root = $this->findFirstPublishedRootByHostAndLanguage($request->getHost(), $request->getLocale());
 
-        if (null !== $root) {
+        if ($root) {
             $root->loadDetails();
             $request->attributes->set('pageModel', $root);
             $GLOBALS['objPage'] = $root;
@@ -130,7 +130,7 @@ abstract class AbstractFilesController implements ServiceSubscriberInterface
         return $this->container->get(__METHOD__);
     }
 
-    private function findFirstPublishedRootByHostAndLanguage(string $host, string $language): ?PageModel
+    private function findFirstPublishedRootByHostAndLanguage(string $host, string $language): PageModel|null
     {
         $t = PageModel::getTable();
         $columns = ["$t.type='root' AND ($t.dns=? OR $t.dns='') AND ($t.language=? OR $t.fallback='1')"];

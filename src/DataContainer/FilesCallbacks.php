@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the ContaoFileAccessBundle.
+ * This file is part of the Contao File Access extension.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -19,15 +19,12 @@ use Contao\Dbafs;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\Input;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 class FilesCallbacks
 {
-    private $projectDir;
-
-    public function __construct(string $projectDir)
+    public function __construct(private readonly string $projectDir)
     {
-        $this->projectDir = $projectDir;
     }
 
     /**

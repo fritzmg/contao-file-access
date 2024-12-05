@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the ContaoFileAccessBundle.
+ * This file is part of the Contao File Access extension.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -22,37 +22,22 @@ use Contao\Image\DeferredImageStorageInterface;
 use Contao\Image\DeferredResizerInterface;
 use Contao\Image\Exception\FileNotExistsException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Webmozart\PathUtil\Path;
 
 class ProtectedImagesController extends AbstractFilesController
 {
-    private ImageFactoryInterface $imageFactory;
-    private DeferredResizerInterface $resizer;
-    private DeferredImageStorageInterface $deferredImageStorage;
-    private Filesystem $filesystem;
-    private ContaoFramework $framework;
-    private string $targetDir;
-    private string $projectDir;
-
     public function __construct(
-        ImageFactoryInterface $imageFactory,
-        DeferredResizerInterface $resizer,
-        DeferredImageStorageInterface $deferredImageStorage,
-        Filesystem $filesystem,
-        ContaoFramework $framework,
-        string $targetDir,
-        string $projectDir
+        private readonly ImageFactoryInterface $imageFactory,
+        private readonly DeferredResizerInterface $resizer,
+        private readonly DeferredImageStorageInterface $deferredImageStorage,
+        private readonly Filesystem $filesystem,
+        private readonly ContaoFramework $framework,
+        private readonly string $targetDir,
+        private readonly string $projectDir,
     ) {
-        $this->imageFactory = $imageFactory;
-        $this->resizer = $resizer;
-        $this->deferredImageStorage = $deferredImageStorage;
-        $this->filesystem = $filesystem;
-        $this->framework = $framework;
-        $this->targetDir = $targetDir;
-        $this->projectDir = $projectDir;
     }
 
     public function __invoke(Request $request, string $path): Response
@@ -66,7 +51,7 @@ class ProtectedImagesController extends AbstractFilesController
         $filePath = Path::join($this->targetDir, $config['path']);
 
         // Initialize the Contao framework
-        $this->framework->initialize(true);
+        $this->framework->initialize();
 
         // Set the root page for the domain as the pageModel attribute
         $this->setRootPage($request);

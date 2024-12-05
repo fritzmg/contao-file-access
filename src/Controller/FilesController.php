@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the ContaoFileAccessBundle.
+ * This file is part of the Contao File Access extension.
  *
- * (c) inspiredminds
+ * (c) INSPIRED MINDS
  *
  * @license LGPL-3.0-or-later
  */
@@ -16,21 +16,16 @@ use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\FilesModel;
-use Contao\PageModel;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Webmozart\PathUtil\Path;
 
 class FilesController extends AbstractFilesController
 {
-    protected $framework;
-    protected $projectDir;
-
-    public function __construct(ContaoFramework $framework, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->projectDir = $projectDir;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+    ) {
     }
 
     public function fileAction(Request $request, string $file): BinaryFileResponse
@@ -43,7 +38,7 @@ class FilesController extends AbstractFilesController
         }
 
         // Initialize the Contao framework
-        $this->framework->initialize(true);
+        $this->framework->initialize();
 
         // Set the root page for the domain as the pageModel attribute
         $this->setRootPage($request);
