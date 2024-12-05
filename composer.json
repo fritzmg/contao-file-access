@@ -47,7 +47,7 @@
         }
     },
     "extra": {
-        "contao-manager-plugin": "InspiredMinds\\ContaoFileAccessBundle\\ContaoManagerPlugin"
+        "contao-manager-plugin": "InspiredMinds\\ContaoFileAccessBundle\\ContaoManager\\Plugin"
     },
     "config": {
         "allow-plugins": {
