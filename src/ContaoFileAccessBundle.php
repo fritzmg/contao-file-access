@@ -24,4 +24,9 @@ class ContaoFileAccessBundle extends Bundle
         $container->addCompilerPass(new AdjustProtectedResizerServicePass());
         $container->addCompilerPass(new AdjustResizerServicePass());
     }
+
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
+    }
 }

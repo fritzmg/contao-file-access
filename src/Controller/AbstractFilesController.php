@@ -23,7 +23,9 @@ use Contao\FrontendUser;
 use Contao\PageModel;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
@@ -43,7 +45,7 @@ abstract class AbstractFilesController implements ServiceSubscriberInterface
         $allowAccess = false;
 
         // Get the current user
-        $user = $this->security()->getUser();
+        $user = $this->tokenStorage()->getToken()?->getUser();
 
         // Check if the current user can access their home directory
         $canAccessHomeDir = $user instanceof FrontendUser && !empty($user->homeDir) && $user->accessHomeDir;
@@ -84,7 +86,7 @@ abstract class AbstractFilesController implements ServiceSubscriberInterface
         // Deny access
         if (!$allowAccess) {
             // If a user is authenticated or the 401 exception does not exist, throw 403 exception
-            if ($this->security()->isGranted('ROLE_MEMBER')) {
+            if ($this->authChecker()->isGranted('ROLE_MEMBER')) {
                 throw new AccessDeniedException();
             }
 
@@ -104,16 +106,25 @@ abstract class AbstractFilesController implements ServiceSubscriberInterface
         }
     }
 
+    #[SubscribedService]
     protected function connection(): Connection
     {
         return $this->container->get(__METHOD__);
     }
 
-    protected function security(): Security
+    #[SubscribedService]
+    protected function tokenStorage(): TokenStorageInterface
     {
         return $this->container->get(__METHOD__);
     }
 
+    #[SubscribedService]
+    protected function authChecker(): AuthorizationCheckerInterface
+    {
+        return $this->container->get(__METHOD__);
+    }
+
+    #[SubscribedService]
     protected function tokenChecker(): TokenChecker
     {
         return $this->container->get(__METHOD__);
