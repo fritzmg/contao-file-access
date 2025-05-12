@@ -57,4 +57,4 @@ thumbnails can still be accessed by anyone.
 
 ## Acknowledgements
 
-Development funded by [KASTNER](https://www.kastner.at/) and [ieQ-systems GmbH & Co. KG](https://www.ieq-systems.de/).
+Development funded by [Helmig + Weber Steuerberater](https://www.helmig-weber.de/).
